@@ -81,16 +81,17 @@ export function CheckoutForm({ storeId, whatsapp, onBack }: CheckoutFormProps) {
           .map((item) => `• ${item.quantity}x ${item.product.name} - ${formatPrice(Number(item.product.price) * item.quantity)}`)
           .join('\n');
         
-        const message = encodeURIComponent(
-          `🍽️ *Novo Pedido*\n\n` +
-          `👤 *Cliente:* ${name}\n` +
-          `📍 *Tipo:* ${modeText}\n` +
-          `${notes ? `📝 *Obs:* ${notes}\n` : ''}\n` +
-          `*Itens:*\n${itemsList}\n\n` +
-          `💰 *Total: ${formatPrice(total)}*`
-        );
+          const message = encodeURIComponent(
+            `🍽️ *Novo Pedido*\n\n` +
+            `👤 *Cliente:* ${name}\n` +
+            `📍 *Tipo:* ${modeText}\n` +
+            `${notes ? `📝 *Observação:* ${notes}\n` : ''}` +
+            `\n*Itens do Pedido:*\n${itemsList}\n\n` +
+            `💰 *Total:* ${formatPrice(total)}\n\n` +
+            `Obrigado pelo pedido! 🙌`
+          );          
 
-        window.open(`https://wa.me/${whatsapp.replace(/\D/g, '')}?text=${message}`, '_blank');
+        window.location.href = `https://wa.me/${whatsapp.replace(/\D/g, '')}?text=${message}`;
       }
 
       toast.success('Pedido realizado com sucesso!');
