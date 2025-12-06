@@ -9,6 +9,7 @@ import { useCart } from '@/contexts/CartContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import { normalizePhone } from '@/lib/phone';
 
 const checkoutSchema = z.object({
   name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres').max(100),
@@ -91,7 +92,8 @@ export function CheckoutForm({ storeId, whatsapp, onBack }: CheckoutFormProps) {
             `Obrigado pelo pedido! 🙌`
           );          
 
-        window.location.href = `https://wa.me/${whatsapp.replace(/\D/g, '')}?text=${message}`;
+          const phone = normalizePhone(whatsapp);
+          window.location.href = `https://wa.me/${phone}?text=${message}`;
       }
 
       toast.success('Pedido realizado com sucesso!');
