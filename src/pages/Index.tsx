@@ -69,7 +69,7 @@ export default function Index() {
         <div className="container px-4 text-center">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-6 animate-fade-in">
             <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-            Cardápio Digital Gratuito
+            Cardápio Digital
           </div>
           <h1 className="text-4xl md:text-6xl font-bold text-foreground max-w-3xl mx-auto leading-tight animate-slide-up">
             Seu cardápio digital
@@ -172,7 +172,7 @@ export default function Index() {
             Pronto para começar?
           </h2>
           <p className="text-primary-foreground/80 max-w-lg mx-auto mb-8">
-            Crie sua conta gratuitamente e tenha seu cardápio digital funcionando em poucos minutos.
+            Crie sua conta e tenha seu cardápio digital funcionando em poucos minutos.
           </p>
           <Link to="/login">
             <Button size="lg" variant="secondary" className="text-base px-8 hover:scale-105 transition-transform">
