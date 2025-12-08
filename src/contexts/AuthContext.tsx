@@ -18,9 +18,51 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // -------------------------------------------------------
+  // SIGN IN
+  // -------------------------------------------------------
+  const signIn = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    return { error };
+  };
+
+  // -------------------------------------------------------
+  // SIGN UP LIMPO (SEM RPC, SEM TABELAS EXTRAS)
+  // -------------------------------------------------------
+  const signUp = async (email: string, password: string) => {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+  
+    if (error) return { error };
+    if (!data.user) return { error: new Error("Usuário não retornado.") };
+  
+    // CHAMAR A FUNÇÃO COM O ID DO USUÁRIO
+    const { data: rpcData, error: setupError } = await supabase.rpc("create_user_setup", {
+      user_uuid: data.user.id
+    });
+    
+    console.log("RPC RESULT:", rpcData);
+    console.error("RPC ERROR:", setupError);
+    
+  
+    if (setupError) {
+      console.error(setupError);
+      return { error: setupError };
+    }
+  
+    return { error: null };
+  };
+  
+  
+
+  // -------------------------------------------------------
+  // SESSION LISTENER
+  // -------------------------------------------------------
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -36,21 +78,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error as Error | null };
-  };
-
-  const signUp = async (email: string, password: string) => {
-    const redirectUrl = `${window.location.origin}/admin`;
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { emailRedirectTo: redirectUrl },
-    });
-    return { error: error as Error | null };
-  };
-
+  // -------------------------------------------------------
+  // SIGN OUT
+  // -------------------------------------------------------
   const signOut = async () => {
     await supabase.auth.signOut();
   };

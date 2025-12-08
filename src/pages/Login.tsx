@@ -62,8 +62,9 @@ export default function Login() {
       return;
     }
 
-    toast.success('Login realizado com sucesso!');
-    navigate('/admin');
+    toast.success('Conta criada com sucesso! Verifique seu e-mail para confirmar o acesso.');
+    navigate('/login');
+
   };
 
   const handleSignUp = async (e: React.FormEvent) => {

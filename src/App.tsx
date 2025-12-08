@@ -11,6 +11,9 @@ import AdminProducts from "./pages/AdminProducts";
 import AdminSettings from "./pages/AdminSettings";
 import Menu from "./pages/Menu";
 import NotFound from "./pages/NotFound";
+import { ProtectedWrapper } from "@/components/ProtectedWrapper";
+import Bloqueado from "./pages/Bloqueado";
+
 
 const queryClient = new QueryClient();
 
@@ -25,9 +28,19 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/admin" element={<Admin />} />
-            <Route path="/admin/produtos" element={<AdminProducts />} />
-            <Route path="/admin/configuracoes" element={<AdminSettings />} />
+            <Route path="/admin/produtos" element={
+              <ProtectedWrapper>
+                <AdminProducts />
+              </ProtectedWrapper>
+            } />
+
+            <Route path="/admin/configuracoes" element={
+              <ProtectedWrapper>
+                <AdminSettings />
+              </ProtectedWrapper>
+            } />
             <Route path="/menu/:storeId" element={<Menu />} />
+            <Route path="/bloqueado" element={<Bloqueado />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
