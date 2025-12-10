@@ -16,7 +16,7 @@ export default function Signatures() {
         "Atualizações ilimitadas",
         "Suporte básico",
       ],
-      caktoUrl: "COLE_SEU_LINK_AQUI_MENSAL",
+      caktoUrl: "https://pay.cakto.com.br/353cp44_682951",
     },
     {
       title: "Plano Trimestral",
@@ -29,7 +29,7 @@ export default function Signatures() {
         "Prioridade no suporte",
         "Relatórios de vendas",
       ],
-      caktoUrl: "COLE_SEU_LINK_AQUI_TRIMESTRAL",
+      caktoUrl: "https://pay.cakto.com.br/8wqmquq_682952",
     },
     {
       title: "Plano Anual",
@@ -42,7 +42,7 @@ export default function Signatures() {
         "Suporte premium",
         "Acesso antecipado a novidades",
       ],
-      caktoUrl: "COLE_SEU_LINK_AQUI_ANUAL",
+      caktoUrl: "https://pay.cakto.com.br/qansza8_682953",
     },
   ];
 

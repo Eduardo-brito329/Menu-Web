@@ -67,10 +67,16 @@ export default function Index() {
       {/* Hero */}
       <section className="hero-gradient py-16 md:py-24">
         <div className="container px-4 text-center">
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-6 animate-fade-in">
+        <div className="flex flex-col items-center gap-3 mb-6 animate-fade-in">
+          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-medium">
             <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-            Cardápio Digital
+            Cardápio Digital Profissional
           </div>
+          <div className="inline-flex items-center gap-2 bg-green-600/15 text-green-600 px-4 py-1.5 rounded-full text-sm font-semibold shadow-sm">
+            🎉 15 Dias Grátis — sem cartão de crédito
+          </div>
+        </div>
+
           <h1 className="text-4xl md:text-6xl font-bold text-foreground max-w-3xl mx-auto leading-tight animate-slide-up">
             Seu cardápio digital
             <span className="text-primary"> estilo iFood</span>
@@ -123,6 +129,29 @@ export default function Index() {
           </div>
         </div>
       </section>
+
+      {/* Free Trial Highlight */}
+    <section className="py-16 md:py-20 bg-card/50 border-y">
+      <div className="container px-4 text-center max-w-3xl mx-auto">
+        <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+          Teste grátis por 15 dias
+        </h2>
+
+        <p className="text-muted-foreground mt-4 text-lg">
+          Crie seu cardápio digital agora e utilize **todas** as funcionalidades por 15 dias,
+          sem pagar nada e sem necessidade de cartão de crédito.
+          Ideal para testar, configurar sua loja e começar a vender.
+        </p>
+
+        <Link to="/login" className="inline-block mt-8">
+          <Button size="lg" className="shadow-button hover:scale-105 transition-transform text-base px-8">
+            Começar agora — é grátis!
+            <ArrowRight className="w-5 h-5 ml-2" />
+          </Button>
+        </Link>
+      </div>
+    </section>
+
 
       {/* Benefits */}
       <section className="py-16 md:py-24">
