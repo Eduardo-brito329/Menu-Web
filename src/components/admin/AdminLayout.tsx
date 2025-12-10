@@ -9,7 +9,8 @@ import {
   LogOut, 
   Menu,
   X,
-  ExternalLink
+  ExternalLink,
+  CreditCard
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -27,6 +28,7 @@ export function AdminLayout({ children, storeId }: AdminLayoutProps) {
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
     { name: 'Produtos', href: '/admin/produtos', icon: Package },
     { name: 'Configurações', href: '/admin/configuracoes', icon: Settings },
+    { name: 'Assinatura', href: '/admin/assinatura', icon: CreditCard },
   ];
 
   const isActive = (path: string) => location.pathname === path;

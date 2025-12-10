@@ -13,6 +13,8 @@ import Menu from "./pages/Menu";
 import NotFound from "./pages/NotFound";
 import { ProtectedWrapper } from "@/components/ProtectedWrapper";
 import Bloqueado from "./pages/Bloqueado";
+import Signatures from "@/pages/Signatures";
+import MenuRouteWrapper from "./pages/MenuRouteWrapper";
 
 
 const queryClient = new QueryClient();
@@ -27,7 +29,14 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/admin" element={<Admin />} />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedWrapper>
+                  <Admin />
+                </ProtectedWrapper>
+              }
+            />
             <Route path="/admin/produtos" element={
               <ProtectedWrapper>
                 <AdminProducts />
@@ -39,7 +48,8 @@ const App = () => (
                 <AdminSettings />
               </ProtectedWrapper>
             } />
-            <Route path="/menu/:storeId" element={<Menu />} />
+            <Route path="/admin/assinatura" element={<Signatures />} />
+            <Route path="/menu/:storeId" element={<MenuRouteWrapper />} />
             <Route path="/bloqueado" element={<Bloqueado />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
