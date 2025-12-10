@@ -138,7 +138,7 @@ export default function Index() {
         </h2>
 
         <p className="text-muted-foreground mt-4 text-lg">
-          Crie seu cardápio digital agora e utilize todas<br>todas</br> as funcionalidades por 15 dias,
+          Crie seu cardápio digital agora e utilize todas as funcionalidades por 15 dias,
           sem pagar nada e sem necessidade de cartão de crédito.
           Ideal para testar, configurar sua loja e começar a vender.
         </p>
