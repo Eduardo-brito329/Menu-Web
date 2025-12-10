@@ -3,42 +3,83 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { RadioGroup } from '@/components/ui/radio-group';
 import { ArrowLeft, Send, MapPin, ShoppingBag } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { normalizePhone } from '@/lib/phone';
+import { supabasePublic } from '@/integrations/supabase/supabasePublic';
 
+/* ============================
+   Validations
+============================ */
 const checkoutSchema = z.object({
   name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres').max(100),
   mode: z.enum(['local', 'retirada']),
   notes: z.string().max(500).optional(),
 });
 
-interface CheckoutFormProps {
-  storeId: string;
-  whatsapp?: string | null;
-  onBack: () => void;
+/* ============================
+   Helpers
+============================ */
+
+const formatPrice = (price: number) =>
+  new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(price);
+
+function openWhatsAppNow(whatsapp: string, message: string) {
+  const phone = normalizePhone(whatsapp);
+  const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+
+  const newTab = window.open(url, '_blank', 'noopener,noreferrer');
+
+  // Fallback
+  if (!newTab) {
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
 }
 
-export function CheckoutForm({ storeId, whatsapp, onBack }: CheckoutFormProps) {
+function buildMessage({ name, mode, notes, items, total }: any) {
+  const modeText = mode === 'local' ? 'Consumo no Local' : 'Retirada';
+
+  const list = items
+    .map(
+      (i: any) =>
+        `• ${i.quantity}x ${i.name} - ${formatPrice(Number(i.price) * i.quantity)}`
+    )
+    .join('\n');
+
+  return (
+    `🍽️ *Novo Pedido*\n\n` +
+    `👤 *Cliente:* ${name}\n` +
+    `📍 *Tipo:* ${modeText}\n` +
+    (notes ? `📝 *Observação:* ${notes}\n` : '') +
+    `\n*Itens do Pedido:*\n${list}\n\n` +
+    `💰 *Total:* ${formatPrice(total)}\n\n` +
+    `Obrigado pelo pedido! 🙌`
+  );
+}
+
+/* ============================
+   Component
+============================ */
+
+export function CheckoutForm({ storeId, whatsapp, onBack }: any) {
   const { items, total, clearCart } = useCart();
+
   const [name, setName] = useState('');
   const [mode, setMode] = useState<'local' | 'retirada'>('local');
   const [notes, setNotes] = useState('');
-  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(false);
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(price);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
 
@@ -46,64 +87,68 @@ export function CheckoutForm({ storeId, whatsapp, onBack }: CheckoutFormProps) {
     if (!validation.success) {
       const fieldErrors: Record<string, string> = {};
       validation.error.errors.forEach((err) => {
-        if (err.path[0]) {
-          fieldErrors[err.path[0] as string] = err.message;
-        }
+        fieldErrors[err.path[0] as string] = err.message;
       });
       setErrors(fieldErrors);
       return;
     }
 
+    // monta objetos
+    const orderItems = items.map((item) => ({
+      id: item.product.id,
+      name: item.product.name,
+      price: Number(item.product.price),
+      quantity: item.quantity,
+    }));
+
+    const message = buildMessage({
+      name,
+      mode,
+      notes,
+      items: orderItems,
+      total,
+    });
+
     setLoading(true);
 
-    try {
-      const orderItems = items.map((item) => ({
-        id: item.product.id,
-        name: item.product.name,
-        price: Number(item.product.price),
-        quantity: item.quantity,
-      }));
-
-      const { error } = await supabase.from('orders').insert({
-        store_id: storeId,
-        items: orderItems,
-        total,
-        customer_name: name.trim(),
-        customer_mode: mode,
-        customer_notes: notes.trim() || null,
-      });
-
-      if (error) throw error;
-
-      // Send to WhatsApp if available
-      if (whatsapp) {
-        const modeText = mode === 'local' ? 'Consumo no Local' : 'Retirada';
-        const itemsList = items
-          .map((item) => `• ${item.quantity}x ${item.product.name} - ${formatPrice(Number(item.product.price) * item.quantity)}`)
-          .join('\n');
-        
-          const message = encodeURIComponent(
-            `🍽️ *Novo Pedido*\n\n` +
-            `👤 *Cliente:* ${name}\n` +
-            `📍 *Tipo:* ${modeText}\n` +
-            `${notes ? `📝 *Observação:* ${notes}\n` : ''}` +
-            `\n*Itens do Pedido:*\n${itemsList}\n\n` +
-            `💰 *Total:* ${formatPrice(total)}\n\n` +
-            `Obrigado pelo pedido! 🙌`
-          );          
-
-          const phone = normalizePhone(whatsapp);
-          window.location.href = `https://wa.me/${phone}?text=${message}`;
-      }
-
-      toast.success('Pedido realizado com sucesso!');
-      clearCart();
-    } catch (error) {
-      console.error('Error creating order:', error);
-      toast.error('Erro ao criar pedido. Tente novamente.');
-    } finally {
-      setLoading(false);
+    /* -------------------------------------------------
+       1️⃣ ABRIR WHATSAPP IMEDIATAMENTE (Chrome Mobile exige isso)
+    ---------------------------------------------------- */
+    if (whatsapp) {
+      openWhatsAppNow(whatsapp, message);
     }
+
+    /* -------------------------------------------------
+       2️⃣ RPC EM PARALELO (não trava botão do usuário)
+    ---------------------------------------------------- */
+    setTimeout(async () => {
+      try {
+        const { error } = await supabasePublic.rpc('create_order', {
+          store_uuid: storeId,
+          items: orderItems,
+          total,
+          customer_name: name.trim(),
+          customer_mode: mode,
+          customer_notes: notes.trim() || null,
+          user_agent: navigator.userAgent,
+          created_at_client: new Date().toISOString(),
+        });
+
+        if (error) {
+          console.error('Erro RPC create_order:', error);
+          toast.error('Pedido enviado pelo WhatsApp, mas falhou no sistema.');
+        } else {
+          toast.success('Pedido registrado e enviado com sucesso!');
+        }
+      } catch (err) {
+        console.error('Erro no RPC:', err);
+        toast.error('Erro ao registrar o pedido.');
+      } finally {
+        clearCart();
+        setLoading(false);
+      }
+    }, 100); // 100ms garante compatibilidade máxima
+
   };
 
   return (
@@ -129,45 +174,40 @@ export function CheckoutForm({ storeId, whatsapp, onBack }: CheckoutFormProps) {
             onChange={(e) => setName(e.target.value)}
             className={errors.name ? 'border-destructive' : ''}
           />
-          {errors.name && (
-            <p className="text-xs text-destructive">{errors.name}</p>
-          )}
+          {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
         </div>
 
         <div className="space-y-3">
           <Label>Como deseja receber? *</Label>
           <RadioGroup
             value={mode}
-            onValueChange={(value) => setMode(value as 'local' | 'retirada')}
+            onValueChange={(v) => setMode(v as any)}
             className="grid grid-cols-2 gap-3"
           >
             <Label
               htmlFor="local"
-              className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+              className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 cursor-pointer ${
                 mode === 'local'
                   ? 'border-primary bg-primary/5'
                   : 'border-border hover:border-primary/50'
               }`}
             >
-              <RadioGroupItem value="local" id="local" className="sr-only" />
+              <input type="radio" id="local" value="local" readOnly checked={mode === 'local'} className="sr-only" />
               <MapPin className={`w-6 h-6 ${mode === 'local' ? 'text-primary' : 'text-muted-foreground'}`} />
-              <span className={`text-sm font-medium ${mode === 'local' ? 'text-primary' : ''}`}>
-                No Local
-              </span>
+              <span className={mode === 'local' ? 'text-primary' : ''}>No Local</span>
             </Label>
+
             <Label
               htmlFor="retirada"
-              className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+              className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 cursor-pointer ${
                 mode === 'retirada'
                   ? 'border-primary bg-primary/5'
                   : 'border-border hover:border-primary/50'
               }`}
             >
-              <RadioGroupItem value="retirada" id="retirada" className="sr-only" />
+              <input type="radio" id="retirada" value="retirada" readOnly checked={mode === 'retirada'} className="sr-only" />
               <ShoppingBag className={`w-6 h-6 ${mode === 'retirada' ? 'text-primary' : 'text-muted-foreground'}`} />
-              <span className={`text-sm font-medium ${mode === 'retirada' ? 'text-primary' : ''}`}>
-                Retirada
-              </span>
+              <span className={mode === 'retirada' ? 'text-primary' : ''}>Retirada</span>
             </Label>
           </RadioGroup>
         </div>
@@ -189,20 +229,9 @@ export function CheckoutForm({ storeId, whatsapp, onBack }: CheckoutFormProps) {
           <span className="font-medium">Total</span>
           <span className="font-bold text-primary">{formatPrice(total)}</span>
         </div>
-        <Button
-          type="submit"
-          size="lg"
-          className="w-full rounded-xl shadow-button"
-          disabled={loading}
-        >
-          {loading ? (
-            'Enviando...'
-          ) : (
-            <>
-              <Send className="w-4 h-4 mr-2" />
-              Enviar Pedido
-            </>
-          )}
+
+        <Button type="submit" size="lg" className="w-full rounded-xl shadow-button" disabled={loading}>
+          {loading ? 'Enviando...' : (<><Send className="w-4 h-4 mr-2" /> Enviar Pedido</>)}
         </Button>
       </div>
     </form>
