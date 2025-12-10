@@ -82,7 +82,7 @@ export default function Index() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8 animate-slide-up" style={{ animationDelay: '0.2s' }}>
             <Link to="/login">
               <Button size="lg" className="text-base px-8 shadow-button hover:scale-105 transition-transform">
-                Começar Agora
+                Inicie seu teste gratuito
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
