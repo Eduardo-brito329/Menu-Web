@@ -18,44 +18,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // 🔥 URL correta de redirecionamento para cada ambiente
+  const redirectTo = import.meta.env.VITE_SUPABASE_REDIRECT_URL;
+
   // -------------------------------------------------------
   // SIGN IN
   // -------------------------------------------------------
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
     return { error };
   };
 
   // -------------------------------------------------------
-  // SIGN UP LIMPO (SEM RPC, SEM TABELAS EXTRAS)
+  // SIGN UP + EMAIL REDIRECT + RPC
   // -------------------------------------------------------
   const signUp = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        emailRedirectTo: redirectTo, // <-- ✔ REDIRECIONAMENTO CORRETO
+      },
     });
-  
+
     if (error) return { error };
     if (!data.user) return { error: new Error("Usuário não retornado.") };
-  
-    // CHAMAR A FUNÇÃO COM O ID DO USUÁRIO
-    const { data: rpcData, error: setupError } = await supabase.rpc("create_user_setup", {
-      user_uuid: data.user.id
-    });
-    
+
+    // Executar criação de loja + trial
+    const { data: rpcData, error: setupError } = await supabase.rpc(
+      "create_user_setup",
+      {
+        user_uuid: data.user.id,
+      }
+    );
+
     console.log("RPC RESULT:", rpcData);
     console.error("RPC ERROR:", setupError);
-    
-  
+
     if (setupError) {
-      console.error(setupError);
       return { error: setupError };
     }
-  
+
     return { error: null };
   };
-  
-  
 
   // -------------------------------------------------------
   // SESSION LISTENER
@@ -86,7 +95,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider
+      value={{ user, session, loading, signIn, signUp, signOut }}
+    >
       {children}
     </AuthContext.Provider>
   );

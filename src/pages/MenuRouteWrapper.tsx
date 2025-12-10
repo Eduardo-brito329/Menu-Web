@@ -1,5 +1,5 @@
+// src/pages/MenuRouteWrapper.tsx
 import { useParams } from "react-router-dom";
-import { ProtectedMenuWrapper } from "@/components/ProtectedMenuWrapper";
 import Menu from "./Menu";
 
 export default function MenuRouteWrapper() {
@@ -9,9 +9,7 @@ export default function MenuRouteWrapper() {
     return <div>Loja não encontrada.</div>;
   }
 
-  return (
-    <ProtectedMenuWrapper storeId={storeId}>
-      <Menu />
-    </ProtectedMenuWrapper>
-  );
+  // AQUI é onde entra o "return <Menu storeId={storeId} />;"
+  // Isso fica NO COMPONENTE WRAPPER, não no App.tsx.
+  return <Menu storeId={storeId} />;
 }

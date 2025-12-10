@@ -48,11 +48,11 @@ export default function Login() {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
-
+  
     setIsSubmitting(true);
     const { error } = await signIn(email, password);
     setIsSubmitting(false);
-
+  
     if (error) {
       if (error.message.includes('Invalid login credentials')) {
         toast.error('E-mail ou senha incorretos');
@@ -61,20 +61,20 @@ export default function Login() {
       }
       return;
     }
-
-    toast.success('Conta criada com sucesso! Verifique seu e-mail para confirmar o acesso.');
-    navigate('/login');
-
+  
+    // ✔️ Login bem-sucedido → vai para o painel, sem mensagem
+    navigate('/admin');
   };
+  
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
-
+  
     setIsSubmitting(true);
     const { error } = await signUp(email, password);
     setIsSubmitting(false);
-
+  
     if (error) {
       if (error.message.includes('already registered')) {
         toast.error('Este e-mail já está cadastrado');
@@ -83,10 +83,11 @@ export default function Login() {
       }
       return;
     }
-
-    toast.success('Conta criada com sucesso!');
-    navigate('/admin');
+  
+    toast.success('Conta criada com sucesso! Verifique seu e-mail para liberar o acesso.');
+    navigate('/login');
   };
+  
 
   if (loading) {
     return (
