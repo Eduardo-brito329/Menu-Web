@@ -12,10 +12,10 @@ export function MenuHeader({ store }: MenuHeaderProps) {
       <div className="h-40 md:h-56 w-full overflow-hidden bg-gradient-to-r from-primary/20 to-primary/10">
         {store.banner_url ? (
           <img
-            src={store.banner_url}
-            alt={`Banner de ${store.name}`}
-            className="w-full h-full object-cover"
-          />
+          src={`${store.banner_url}?width=800&quality=80&format=webp`}
+          alt={store.name}
+          className="w-full h-full object-cover"
+        />        
         ) : (
           <div className="w-full h-full food-gradient opacity-80" />
         )}

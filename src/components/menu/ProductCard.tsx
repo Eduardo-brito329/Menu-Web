@@ -13,7 +13,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
   const handleAddToCart = () => {
     addItem(product);
-    toast.success(`${product.name} adicionado ao carrinho!`);
+    toast.success(`${product.name} adicionado ao carrinho!`, { duration: 1200 });
   };
 
   const formatPrice = (price: number) => {
@@ -55,10 +55,10 @@ export function ProductCard({ product }: ProductCardProps) {
         {product.image_url && (
           <div className="w-24 h-24 md:w-28 md:h-28 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
             <img
-              src={product.image_url}
-              alt={product.name}
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-            />
+            src={`${product.image_url}?width=400&quality=75&format=webp`}
+            alt={product.name}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+          />
           </div>
         )}
       </div>

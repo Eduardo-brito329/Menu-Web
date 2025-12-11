@@ -37,7 +37,7 @@ export function CartSheet({ storeId, whatsapp }: CartSheetProps) {
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-md flex flex-col">
+      <SheetContent className="w-full sm:max-w-md flex flex-col overflow-hidden">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             <ShoppingCart className="w-5 h-5" />
@@ -56,11 +56,13 @@ export function CartSheet({ storeId, whatsapp }: CartSheetProps) {
             </p>
           </div>
         ) : showCheckout ? (
+          <div className="flex-1 overflow-y-auto pr-1">
           <CheckoutForm
             storeId={storeId}
             whatsapp={whatsapp}
             onBack={() => setShowCheckout(false)}
           />
+          </div>
         ) : (
           <>
             <div className="flex-1 overflow-auto py-4 space-y-3">
@@ -71,10 +73,10 @@ export function CartSheet({ storeId, whatsapp }: CartSheetProps) {
                 >
                   {item.product.image_url && (
                     <img
-                      src={item.product.image_url}
-                      alt={item.product.name}
-                      className="w-16 h-16 rounded-lg object-cover"
-                    />
+                    src={`${item.product.image_url}?width=200&quality=75&format=webp`}
+                    alt={item.product.name}
+                    className="w-16 h-16 rounded-lg object-cover"
+                  />
                   )}
                   <div className="flex-1 min-w-0">
                     <h4 className="font-medium text-sm truncate">{item.product.name}</h4>
