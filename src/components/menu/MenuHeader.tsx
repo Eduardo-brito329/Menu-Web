@@ -8,33 +8,51 @@ interface MenuHeaderProps {
 export function MenuHeader({ store }: MenuHeaderProps) {
   return (
     <header className="relative">
-      {/* Banner */}
-      <div className="h-40 md:h-56 w-full overflow-hidden bg-gradient-to-r from-primary/20 to-primary/10">
-        {store.banner_url ? (
-          <img
-          src={`${store.banner_url}?width=800&quality=80&format=webp`}
-          alt={store.name}
-          className="w-full h-full object-cover"
-        />        
-        ) : (
-          <div className="w-full h-full food-gradient opacity-80" />
-        )}
-      </div>
 
-      {/* Store Info */}
+      {/* BANNER OTIMIZADO (CORRIGIDO) */}
+        <div className="h-40 md:h-56 w-full overflow-hidden bg-gradient-to-r from-primary/20 to-primary/10 relative">
+
+        {/* Placeholder atrás do banner */}
+        <div className="absolute inset-0 bg-muted/40 animate-pulse z-0" />
+
+        {store.banner_url && (
+          <img
+            src={`${store.banner_url}?width=600&quality=70&format=webp`}
+            alt={store.name}
+            loading="lazy"
+            decoding="async"
+            className="w-full h-full object-cover absolute inset-0 z-11"
+          />
+        )}
+
+        {!store.banner_url && (
+          <div className="absolute inset-0 food-gradient opacity-80 z-11" />
+        )}
+        </div>
+
+
+      {/* STORE INFO */}
       <div className="container relative -mt-12 px-4">
         <div className="bg-card rounded-2xl shadow-elevated p-4 md:p-6 animate-slide-up">
+
           <div className="flex items-start gap-4">
-            {/* Logo */}
-            <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden bg-muted flex-shrink-0 shadow-card">
+
+            {/* LOGO OTIMIZADO */}
+            <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden bg-muted flex-shrink-0 shadow-card relative">
+
+              {/* Blur placeholder do logo */}
+              <div className="absolute inset-0 bg-muted/40 animate-pulse" />
+
               {store.logo_url ? (
                 <img
-                  src={store.logo_url}
+                  src={`${store.logo_url}?width=200&quality=70&format=webp`}
                   alt={store.name}
-                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-full object-cover relative z-10"
                 />
               ) : (
-                <div className="w-full h-full food-gradient flex items-center justify-center">
+                <div className="w-full h-full food-gradient flex items-center justify-center relative z-10">
                   <span className="text-3xl font-bold text-primary-foreground">
                     {store.name.charAt(0)}
                   </span>
@@ -42,41 +60,46 @@ export function MenuHeader({ store }: MenuHeaderProps) {
               )}
             </div>
 
-            {/* Info */}
+            {/* TEXTO */}
             <div className="flex-1 min-w-0">
               <h1 className="text-xl md:text-2xl font-bold text-foreground truncate">
                 {store.name}
               </h1>
+
               {store.description && (
                 <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
                   {store.description}
                 </p>
               )}
-           <div className="flex flex-wrap items-center gap-3 mt-3">
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-accent bg-accent/10 px-2.5 py-1 rounded-full">
-              <span className="text-sm font-semibold">
-                {store.is_open ? (
-                  <span className="text-green-600">Aberto agora</span>
-                ) : (
-                  <span className="text-red-600">Fechado agora</span>
-                )}
-              </span>
-            </span>
 
-            {store.whatsapp && (
-              <a
-                href={`https://wa.me/${store.whatsapp.replace(/\D/g, '')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors"
-              >
-                <Phone className="w-3.5 h-3.5" />
-                WhatsApp
-              </a>
-            )}
+              {/* TAGS */}
+              <div className="flex flex-wrap items-center gap-3 mt-3">
+
+                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-accent bg-accent/10 px-2.5 py-1 rounded-full">
+                  {store.is_open ? (
+                    <span className="text-green-600 font-semibold">Aberto agora</span>
+                  ) : (
+                    <span className="text-red-600 font-semibold">Fechado agora</span>
+                  )}
+                </span>
+
+                {store.whatsapp && (
+                  <a
+                    href={`https://wa.me/${store.whatsapp.replace(/\D/g, '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                    WhatsApp
+                  </a>
+                )}
+
               </div>
             </div>
+
           </div>
+
         </div>
       </div>
     </header>

@@ -19,26 +19,35 @@ export default function Menu({ storeId }: { storeId: string }) {
     checkStoreStatus();
   }, [storeId]);
 
+  /* ============================================
+      1) Validação da assinatura
+  ============================================ */
   const checkStoreStatus = async () => {
     try {
       const { data, error } = await supabasePublic.rpc("check_store_status", {
         store_uuid: storeId,
       });
+
       if (error) {
         console.error("Erro RPC:", error);
         return;
       }
+
       if (data?.allowed === false) {
         setBlocked(true);
         setLoading(false);
         return;
       }
+
       fetchStoreAndProducts();
     } catch (err) {
       console.error("Erro RPC:", err);
     }
   };
 
+  /* ============================================
+      2) Buscar loja + produtos
+  ============================================ */
   const fetchStoreAndProducts = async () => {
     try {
       const { data: storeData, error: storeError } = await supabasePublic
@@ -75,6 +84,10 @@ export default function Menu({ storeId }: { storeId: string }) {
     }
   };
 
+  /* ============================================
+      3) Estados de bloqueio / loading / erro
+  ============================================ */
+
   if (blocked) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6 text-center">
@@ -83,7 +96,7 @@ export default function Menu({ storeId }: { storeId: string }) {
             <UtensilsCrossed className="w-10 h-10 text-muted-foreground" />
           </div>
           <h1 className="text-2xl font-bold mb-2">Cardápio Indisponível</h1>
-          <p className="text-muted-foreground">Este estabelecimento não está ativo no momento.</p>
+          <p className="text-muted-foreground">Esta loja está com assinatura inativa.</p>
         </div>
       </div>
     );
@@ -118,6 +131,9 @@ export default function Menu({ storeId }: { storeId: string }) {
     );
   }
 
+  /* ============================================
+      4) Agrupar produtos por categoria
+  ============================================ */
   const groupedProducts = products.reduce((acc, product) => {
     const category = product.category || 'Outros';
     if (!acc[category]) acc[category] = [];
@@ -125,6 +141,9 @@ export default function Menu({ storeId }: { storeId: string }) {
     return acc;
   }, {} as Record<string, Product[]>);
 
+  /* ============================================
+      5) Renderização otimizada
+  ============================================ */
   return (
     <CartProvider>
       <div className="min-h-screen bg-background pb-24">
@@ -146,9 +165,19 @@ export default function Menu({ storeId }: { storeId: string }) {
                   <h2 className="text-lg font-bold mb-4 sticky top-0 bg-background py-2">
                     {category}
                   </h2>
+
                   <div className="grid gap-4">
                     {items.map((product) => (
-                      <ProductCard key={product.id} product={product} />
+                      <ProductCard
+                        key={product.id}
+                        product={{
+                          ...product,
+                          // IMAGEM OTIMIZADA
+                          image_url: product.image_url
+                            ? `${product.image_url}?width=500&quality=70&format=webp`
+                            : null,
+                        }}
+                      />
                     ))}
                   </div>
                 </section>
